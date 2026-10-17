@@ -1,16 +1,129 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<?import javafx.scene.control.Button?>
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
+<HBox alignment="CENTER_LEFT" prefHeight="700.0" prefWidth="1100.0"
+      style="-fx-background-color: #f1f5f9;"
+      xmlns="http://javafx.com/javafx/17.0.12"
+      xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="org.apache.maven.archetypes.hotelflow.HelloController">
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
-    </padding>
 
-    <Label fx:id="welcomeText"/>
-    <Button text="Hello!" onAction="#onHelloButtonClick"/>
-</VBox>
+    <!-- SOL TARAF: Genişletilmiş Form Alanı -->
+    <VBox alignment="CENTER" spacing="20.0" HBox.hgrow="ALWAYS">
+        <padding>
+            <Insets bottom="40.0" left="50.0" right="50.0" top="40.0" />
+        </padding>
+        <children>
+            <!-- Giriş Kartı (Genişliği 440px yapıldı) -->
+            <VBox alignment="CENTER_LEFT" maxWidth="440.0" spacing="20.0"
+                  style="-fx-background-color: white; -fx-padding: 45 40 45 40; -fx-background-radius: 16; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 25, 0, 0, 8);">
+                <children>
+                    <!-- Başlık ve Alt Başlık -->
+                    <VBox spacing="6.0">
+                        <Label text="LOGIN" textFill="#0f172a">
+                            <font>
+                                <Font name="System Bold" size="32.0" />
+                            </font>
+                        </Label>
+                        <Label text="Sign in to continue to HotelFlow system" textFill="#64748b">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Label>
+                    </VBox>
+
+                    <!-- Kullanıcı Adı Girişi -->
+                    <VBox spacing="8.0">
+                        <Label text="Username" textFill="#334155">
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                        </Label>
+                        <TextField fx:id="usernameField" prefHeight="48.0" promptText="Enter your username"
+                                   style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-padding: 0 14; -fx-font-size: 14px;" />
+                    </VBox>
+
+                    <!-- Şifre Girişi -->
+                    <VBox spacing="8.0">
+                        <Label text="Password" textFill="#334155">
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                        </Label>
+                        <PasswordField fx:id="passwordField" prefHeight="48.0" promptText="Enter your password"
+                                       style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-padding: 0 14; -fx-font-size: 14px;" />
+                    </VBox>
+
+                    <!-- Giriş Butonu -->
+                    <Button fx:id="loginButton" maxWidth="Infinity" onAction="#onLoginButtonClick" prefHeight="48.0" text="Sign In"
+                            style="-fx-background-color: #1d4ed8; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 15px; -fx-background-radius: 8; -fx-cursor: hand;">
+                        <VBox.margin>
+                            <Insets top="10.0" />
+                        </VBox.margin>
+                    </Button>
+
+                    <!-- Durum / Hata Mesajı -->
+                    <Label fx:id="statusLabel" alignment="CENTER" maxWidth="Infinity" textFill="#dc2626" wrapText="true">
+                        <font>
+                            <Font size="13.0" />
+                        </font>
+                    </Label>
+                </children>
+            </VBox>
+        </children>
+    </VBox>
+
+    <!-- SAĞ TARAF: Büyütülmüş Siyah Yan Panel (Genişlik: 500px) -->
+    <StackPane maxWidth="600.0" minWidth="440.0" prefWidth="500.0" HBox.hgrow="NEVER">
+        <children>
+            <!-- 1. Arka Plan Fotoğrafı -->
+            <ImageView fx:id="bgImageView" fitHeight="700.0" fitWidth="500.0" preserveRatio="false">
+                <image>
+                    <Image url="@images/hotel_bg.jpg" />
+                </image>
+            </ImageView>
+
+            <!-- 2. Karartma Katmanı -->
+            <Pane style="-fx-background-color: rgba(15, 23, 42, 0.82);" />
+
+            <!-- 3. İçerik -->
+            <VBox alignment="CENTER" spacing="24.0">
+                <padding>
+                    <Insets bottom="50.0" left="40.0" right="40.0" top="50.0" />
+                </padding>
+                <children>
+                    <!-- Günün Tarihi Rozeti -->
+                    <Label fx:id="dateLabel" text="18 October 2026" textFill="#e2e8f0">
+                        <font>
+                            <Font name="System Bold" size="15.0" />
+                        </font>
+                        <style>
+                            -fx-background-color: rgba(255, 255, 255, 0.14);
+                            -fx-padding: 8 18;
+                            -fx-background-radius: 25;
+                        </style>
+                    </Label>
+
+                    <!-- Otel Başlığı -->
+                    <Label text="HotelFlow" textFill="WHITE">
+                        <font>
+                            <Font name="System Bold" size="40.0" />
+                        </font>
+                    </Label>
+
+                    <Label alignment="CENTER" maxWidth="380.0" text="Hotel Management &amp; Information System"
+                           textAlignment="CENTER" textFill="#94a3b8" wrapText="true">
+                        <font>
+                            <Font size="16.0" />
+                        </font>
+                    </Label>
+                </children>
+            </VBox>
+        </children>
+    </StackPane>
+
+</HBox>
