@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane prefHeight="700.0" prefWidth="1100.0" style="-fx-background-color: #f8fafc;"
+            xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.apache.maven.archetypes.hotelflow.DashboardController">
+
+    <!-- SOL PANEL: Rol Tabanlı Menü Çubuğu (Sidebar) -->
+    <left>
+        <VBox prefWidth="250.0" spacing="12.0" style="-fx-background-color: #0f172a; -fx-padding: 24 16 24 16;">
+            <!-- Logo & Başlık -->
+            <VBox spacing="4.0">
+                <Label text="HotelFlow" textFill="WHITE">
+                    <font>
+                        <Font name="System Bold" size="24.0"/>
+                    </font>
+                </Label>
+                <Label text="Management System" textFill="#94a3b8">
+                    <font>
+                        <Font size="12.0"/>
+                    </font>
+                </Label>
+            </VBox>
+
+            <Separator style="-fx-opacity: 0.15; -fx-padding: 8 0;"/>
+
+            <!-- Giriş Yapan Kullanıcı Özeti Kartı -->
+            <VBox spacing="4.0" style="-fx-background-color: #1e293b; -fx-padding: 12; -fx-background-radius: 8;">
+                <Label fx:id="userNameLabel" text="User Name" textFill="#f1f5f9">
+                    <font>
+                        <Font name="System Bold" size="13.0"/>
+                    </font>
+                </Label>
+                <Label fx:id="userRoleBadge" text="ROLE" textFill="#38bdf8">
+                    <font>
+                        <Font name="System Bold" size="11.0"/>
+                    </font>
+                </Label>
+            </VBox>
+
+            <!-- Navigasyon Butonları (Rol Yetkisine Göre Açılıp Kapanacak) -->
+            <VBox fx:id="menuContainer" spacing="6.0" VBox.vgrow="ALWAYS">
+                <!-- Admin Menüleri -->
+                <Button fx:id="btnManageOwners" maxWidth="Infinity" alignment="BASELINE_LEFT" text="👥  Owner Management"
+                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e1; -fx-font-size: 13px; -fx-cursor: hand; -fx-padding: 10 14; -fx-background-radius: 6;"/>
+
+                <!-- Owner Menüleri -->
+                <Button fx:id="btnHotels" maxWidth="Infinity" alignment="BASELINE_LEFT" text="🏨  My Hotels"
+                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e1; -fx-font-size: 13px; -fx-cursor: hand; -fx-padding: 10 14; -fx-background-radius: 6;"/>
+                <Button fx:id="btnAssignManagers" maxWidth="Infinity" alignment="BASELINE_LEFT" text="👔  Assign Managers"
+                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e1; -fx-font-size: 13px; -fx-cursor: hand; -fx-padding: 10 14; -fx-background-radius: 6;"/>
+
+                <!-- Manager Menüleri -->
+                <Button fx:id="btnReceptionists" maxWidth="Infinity" alignment="BASELINE_LEFT" text="👨‍💼  Receptionists"
+                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e1; -fx-font-size: 13px; -fx-cursor: hand; -fx-padding: 10 14; -fx-background-radius: 6;"/>
+                <Button fx:id="btnServices" maxWidth="Infinity" alignment="BASELINE_LEFT" text="🛎️  Seasonal Services"
+                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e1; -fx-font-size: 13px; -fx-cursor: hand; -fx-padding: 10 14; -fx-background-radius: 6;"/>
+
+                <!-- Receptionist Menüleri -->
+                <Button fx:id="btnReservations" maxWidth="Infinity" alignment="BASELINE_LEFT" text="📅  Reservations"
+                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e1; -fx-font-size: 13px; -fx-cursor: hand; -fx-padding: 10 14; -fx-background-radius: 6;"/>
+                <Button fx:id="btnCheckIn" maxWidth="Infinity" alignment="BASELINE_LEFT" text="🔑  Check-In Desk"
+                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e1; -fx-font-size: 13px; -fx-cursor: hand; -fx-padding: 10 14; -fx-background-radius: 6;"/>
+                <Button fx:id="btnClients" maxWidth="Infinity" alignment="BASELINE_LEFT" text="👤  Clients"
+                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e1; -fx-font-size: 13px; -fx-cursor: hand; -fx-padding: 10 14; -fx-background-radius: 6;"/>
+
+                <!-- Ortak / Rapor Menüsü -->
+                <Button fx:id="btnReports" maxWidth="Infinity" alignment="BASELINE_LEFT" text="📊  Reports"
+                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e1; -fx-font-size: 13px; -fx-cursor: hand; -fx-padding: 10 14; -fx-background-radius: 6;"/>
+            </VBox>
+
+            <!-- Çıkış Yap Butonu -->
+            <Button maxWidth="Infinity" onAction="#handleLogout" text="🚪  Sign Out"
+                    style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px; -fx-cursor: hand; -fx-padding: 10; -fx-background-radius: 6;"/>
+        </VBox>
+    </left>
+
+    <!-- SAĞ BÖLÜM: Üst Çubuk ve Dinamik İçerik Alanı -->
+    <center>
+        <VBox spacing="20.0" style="-fx-padding: 30;">
+            <!-- Üst Karşılama Başlığı -->
+            <HBox alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.03), 15, 0, 0, 4);">
+                <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                    <Label fx:id="welcomeHeaderLabel" text="Welcome to HotelFlow" textFill="#0f172a">
+                        <font>
+                            <Font name="System Bold" size="22.0"/>
+                        </font>
+                    </Label>
+                    <Label text="Select a module from the left menu to get started." textFill="#64748b">
+                        <font>
+                            <Font size="13.0"/>
+                        </font>
+                    </Label>
+                </VBox>
+            </HBox>
+
+            <!-- Ana İçerik / Kartlar Konteynırı -->
+            <StackPane fx:id="contentArea" VBox.vgrow="ALWAYS"
+                       style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 24; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.03), 15, 0, 0, 4);">
+                <Label text="Main content will appear here when a menu item is clicked." textFill="#94a3b8">
+                    <font>
+                        <Font size="15.0"/>
+                    </font>
+                </Label>
+            </StackPane>
+        </VBox>
+    </center>
+
+</BorderPane>
