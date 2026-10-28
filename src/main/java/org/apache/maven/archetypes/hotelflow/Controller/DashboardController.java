@@ -1,5 +1,4 @@
-package org.apache.maven.archetypes.hotelflow
-;
+package org.apache.maven.archetypes.hotelflow.Controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -48,10 +47,34 @@ public class DashboardController {
 
         // Rol yetkilerine göre butonları filtrele (FR-02)
         applyRolePermissions(currentUser.getRole());
+
+        // Buton tıklama eylemlerini bağla
+        setupNavigationActions(currentUser.getRole());
+    }
+
+    private void setupNavigationActions(Role role) {
+        if (btnReservations != null) {
+            btnReservations.setOnAction(e -> loadView("reservations-view.fxml"));
+        }
+
+        // Resepsiyonist oturum açtığında doğrudan rezervasyon listesi karşısına gelsin
+        if (role == Role.RECEPTIONIST) {
+            loadView("reservations-view.fxml");
+        }
+    }
+
+    public void loadView(String fxmlFile) {
+        try {
+            FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource(fxmlFile));
+            Node node = loader.load();
+            contentArea.getChildren().setAll(node);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Görünüm yüklenemedi: " + fxmlFile);
+        }
     }
 
     private void applyRolePermissions(Role role) {
-        // Önce hepsini gizle
         hideAllMenuButtons();
 
         switch (role) {
@@ -92,7 +115,7 @@ public class DashboardController {
     private void setButtonVisible(Button btn, boolean visible) {
         if (btn != null) {
             btn.setVisible(visible);
-            btn.setManaged(visible); // Görünmeyen butonun yeri boş kalmasın diye daraltır
+            btn.setManaged(visible);
         }
     }
 

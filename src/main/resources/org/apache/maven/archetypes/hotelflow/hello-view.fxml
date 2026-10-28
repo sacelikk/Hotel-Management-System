@@ -10,7 +10,7 @@
       style="-fx-background-color: #f1f5f9;"
       xmlns="http://javafx.com/javafx/17.0.12"
       xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="org.apache.maven.archetypes.hotelflow.HelloController">
+      fx:controller="org.apache.maven.archetypes.hotelflow.Controller.HelloController">
 
     <!-- SOL TARAF: Genişletilmiş Form Alanı -->
     <VBox alignment="CENTER" spacing="20.0" HBox.hgrow="ALWAYS">

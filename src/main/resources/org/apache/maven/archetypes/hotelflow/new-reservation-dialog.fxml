@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox spacing="16.0" prefWidth="480.0" style="-fx-background-color: white; -fx-padding: 24;"
+      xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.apache.maven.archetypes.hotelflow.Controller.NewReservationDialogController">
+
+    <!-- Başlık -->
+    <VBox spacing="4.0">
+        <Label text="New Booking" textFill="#0f172a">
+            <font>
+                <Font name="System Bold" size="20.0" />
+            </font>
+        </Label>
+        <Label text="Fill in the booking details to register a new reservation." textFill="#64748b">
+            <font>
+                <Font size="13.0" />
+            </font>
+        </Label>
+    </VBox>
+
+    <Separator />
+
+    <!-- Form Alanları -->
+    <GridPane hgap="12.0" vgap="14.0">
+        <columnConstraints>
+            <ColumnConstraints percentWidth="50.0" />
+            <ColumnConstraints percentWidth="50.0" />
+        </columnConstraints>
+
+        <!-- Client ID -->
+        <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+            <Label text="Client ID *" textFill="#334155" style="-fx-font-weight: bold; -fx-font-size: 12px;" />
+            <TextField fx:id="clientIdField" promptText="e.g. 104" prefHeight="38.0"
+                       style="-fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6;" />
+        </VBox>
+
+        <!-- Room ID -->
+        <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+            <Label text="Room ID *" textFill="#334155" style="-fx-font-weight: bold; -fx-font-size: 12px;" />
+            <TextField fx:id="roomIdField" promptText="e.g. 302" prefHeight="38.0"
+                       style="-fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6;" />
+        </VBox>
+
+        <!-- Check-In Date -->
+        <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+            <Label text="Check-In Date *" textFill="#334155" style="-fx-font-weight: bold; -fx-font-size: 12px;" />
+            <DatePicker fx:id="checkInDatePicker" maxWidth="Infinity" prefHeight="38.0"
+                        style="-fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6;" />
+        </VBox>
+
+        <!-- Check-Out Date -->
+        <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <Label text="Check-Out Date *" textFill="#334155" style="-fx-font-weight: bold; -fx-font-size: 12px;" />
+            <DatePicker fx:id="checkOutDatePicker" maxWidth="Infinity" prefHeight="38.0"
+                        style="-fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6;" />
+        </VBox>
+
+        <!-- Booking Type -->
+        <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
+            <Label text="Booking Type" textFill="#334155" style="-fx-font-weight: bold; -fx-font-size: 12px;" />
+            <ComboBox fx:id="bookingTypeCombo" maxWidth="Infinity" prefHeight="38.0"
+                      style="-fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6;" />
+        </VBox>
+
+        <!-- Cancellation Policy -->
+        <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+            <Label text="Cancellation Policy" textFill="#334155" style="-fx-font-weight: bold; -fx-font-size: 12px;" />
+            <ComboBox fx:id="cancellationTypeCombo" maxWidth="Infinity" prefHeight="38.0"
+                      style="-fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6;" />
+        </VBox>
+    </GridPane>
+
+    <!-- Hata Mesajı -->
+    <Label fx:id="errorLabel" textFill="#dc2626" wrapText="true" visible="false">
+        <font>
+            <Font size="12.0" />
+        </font>
+    </Label>
+
+    <Region VBox.vgrow="ALWAYS" />
+
+    <!-- Butonlar -->
+    <HBox alignment="CENTER_RIGHT" spacing="12.0">
+        <Button onAction="#handleCancel" text="Cancel" prefHeight="38.0"
+                style="-fx-background-color: #f1f5f9; -fx-text-fill: #475569; -fx-background-radius: 6; -fx-padding: 0 20; -fx-cursor: hand;" />
+        <Button onAction="#handleSave" text="Create Reservation" prefHeight="38.0"
+                style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 0 20; -fx-cursor: hand;" />
+    </HBox>
+
+</VBox>

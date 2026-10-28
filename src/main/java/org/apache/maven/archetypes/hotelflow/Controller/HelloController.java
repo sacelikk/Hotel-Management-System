@@ -1,4 +1,4 @@
-package org.apache.maven.archetypes.hotelflow;
+package org.apache.maven.archetypes.hotelflow.Controller;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -9,6 +9,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
+import org.apache.maven.archetypes.hotelflow.HelloApplication;
 import org.apache.maven.archetypes.hotelflow.Model.Role;
 import org.apache.maven.archetypes.hotelflow.Model.User;
 import org.apache.maven.archetypes.hotelflow.Util.UserSession;

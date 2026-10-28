@@ -7,7 +7,7 @@
 
 <BorderPane prefHeight="700.0" prefWidth="1100.0" style="-fx-background-color: #f8fafc;"
             xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.apache.maven.archetypes.hotelflow.DashboardController">
+            fx:controller="org.apache.maven.archetypes.hotelflow.Controller.DashboardController">
 
     <!-- SOL PANEL: Rol Tabanlı Menü Çubuğu (Sidebar) -->
     <left>
