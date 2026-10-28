@@ -57,7 +57,15 @@ public class DashboardController {
             btnReservations.setOnAction(e -> loadView("reservations-view.fxml"));
         }
 
-        // Resepsiyonist oturum açtığında doğrudan rezervasyon listesi karşısına gelsin
+        if (btnCheckIn != null) {
+            btnCheckIn.setOnAction(e -> loadView("checkin-view.fxml"));
+        }
+
+        // Müşteriler butonu bağlantısı:
+        if (btnClients != null) {
+            btnClients.setOnAction(e -> loadView("clients-view.fxml"));
+        }
+
         if (role == Role.RECEPTIONIST) {
             loadView("reservations-view.fxml");
         }

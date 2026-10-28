@@ -70,7 +70,7 @@ public class HelloController {
         User user = mockUsers.get(username.toLowerCase());
 
         if (user != null && user.authenticate(password)) {
-            UserSession.getInstance().login(user);
+            UserSession.getInstance().login(user);//login time
             statusLabel.setStyle("-fx-text-fill: #16a34a;");
             statusLabel.setText("Login successful! Redirecting...");
 

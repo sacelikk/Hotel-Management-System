@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox spacing="16.0" style="-fx-background-color: transparent;"
+      xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.apache.maven.archetypes.hotelflow.Controller.ClientsController">
+
+    <!-- Başlık ve Yeni Müşteri Butonu -->
+    <HBox alignment="CENTER_LEFT" spacing="12.0">
+        <VBox HBox.hgrow="ALWAYS">
+            <Label text="Client Management" textFill="#0f172a">
+                <font>
+                    <Font name="System Bold" size="20.0" />
+                </font>
+            </Label>
+            <Label text="Track guest profiles, monitor blacklist status, and register new guests." textFill="#64748b">
+                <font>
+                    <Font size="13.0" />
+                </font>
+            </Label>
+        </VBox>
+        <Button onAction="#handleNewClient" text="+ Add New Client"
+                style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 16; -fx-cursor: hand;" />
+    </HBox>
+
+    <!-- Filtreleme Çubuğu -->
+    <HBox alignment="CENTER_LEFT" spacing="12.0"
+          style="-fx-background-color: white; -fx-padding: 12 16; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+        <TextField fx:id="searchField" promptText="Search by Name, Email, or Phone..." prefWidth="300.0"
+                   style="-fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-padding: 6 10;" />
+        <CheckBox fx:id="chkOnlyRisky" text="Show Risky Clients Only" textFill="#dc2626" style="-fx-font-weight: bold;" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button onAction="#handleReset" text="Reset"
+                style="-fx-background-color: #f1f5f9; -fx-text-fill: #475569; -fx-background-radius: 6; -fx-cursor: hand; -fx-padding: 6 14;" />
+    </HBox>
+
+    <!-- Müşteri Tablosu -->
+    <TableView fx:id="clientsTable" VBox.vgrow="ALWAYS"
+               style="-fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+        <columns>
+            <TableColumn fx:id="colClientId" text="Client ID" prefWidth="90.0" />
+            <TableColumn fx:id="colFullName" text="Full Name" prefWidth="180.0" />
+            <TableColumn fx:id="colEmail" text="Email" prefWidth="200.0" />
+            <TableColumn fx:id="colPhone" text="Phone Number" prefWidth="150.0" />
+            <TableColumn fx:id="colAddress" text="Address" prefWidth="180.0" />
+            <TableColumn fx:id="colRisky" text="Risk Status" prefWidth="130.0" />
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+        </columnResizePolicy>
+    </TableView>
+
+    <!-- Alt Aksiyon Çubuğu -->
+    <HBox alignment="CENTER_RIGHT" spacing="12.0">
+        <Label fx:id="statusLabel" text="Total registered clients: 0" textFill="#64748b" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+        <Button onAction="#handleToggleRiskStatus" text="⚠️ Toggle Risk / Blacklist"
+                style="-fx-background-color: #fee2e2; -fx-text-fill: #b91c1c; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 16; -fx-cursor: hand;" />
+    </HBox>
+
+</VBox>

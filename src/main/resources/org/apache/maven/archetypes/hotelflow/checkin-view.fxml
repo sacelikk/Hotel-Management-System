@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox spacing="16.0" style="-fx-background-color: transparent;"
+      xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.apache.maven.archetypes.hotelflow.Controller.CheckInController">
+
+    <!-- Üst Başlık -->
+    <HBox alignment="CENTER_LEFT" spacing="12.0">
+        <VBox HBox.hgrow="ALWAYS">
+            <Label text="Check-In / Check-Out Desk" textFill="#0f172a">
+                <font>
+                    <Font name="System Bold" size="20.0" />
+                </font>
+            </Label>
+            <Label text="Manage front desk arrivals, assign room keys, and complete departures." textFill="#64748b">
+                <font>
+                    <Font size="13.0" />
+                </font>
+            </Label>
+        </VBox>
+    </HBox>
+
+    <!-- Arama ve Hızlı Filtre -->
+    <HBox alignment="CENTER_LEFT" spacing="12.0"
+          style="-fx-background-color: white; -fx-padding: 12 16; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+        <TextField fx:id="searchField" promptText="Filter by Room # or Booking #..." prefWidth="280.0"
+                   style="-fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-padding: 6 10;" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button onAction="#handleRefresh" text="Refresh"
+                style="-fx-background-color: #f1f5f9; -fx-text-fill: #475569; -fx-background-radius: 6; -fx-cursor: hand; -fx-padding: 6 14;" />
+    </HBox>
+
+    <!-- Check-In / Konaklama Tablosu -->
+    <TableView fx:id="checkInTable" VBox.vgrow="ALWAYS"
+               style="-fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+        <columns>
+            <TableColumn fx:id="colCheckInId" text="ID" prefWidth="60.0" />
+            <TableColumn fx:id="colBookingId" text="Booking ID" prefWidth="90.0" />
+            <TableColumn fx:id="colRoomNumber" text="Room No" prefWidth="80.0" />
+            <TableColumn fx:id="colCheckInTime" text="Check-In Time" prefWidth="180.0" />
+            <TableColumn fx:id="colCheckOutTime" text="Check-Out Time" prefWidth="180.0" />
+            <TableColumn fx:id="colStatus" text="Stay Status" prefWidth="130.0" />
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+        </columnResizePolicy>
+    </TableView>
+
+    <!-- Alt Aksiyon Çubuğu -->
+    <HBox alignment="CENTER_RIGHT" spacing="12.0">
+        <Label fx:id="statusMessageLabel" text="Select a stay record to perform actions." textFill="#64748b" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+        <Button onAction="#handleCompleteCheckOut" text="🚪 Complete Check-Out"
+                style="-fx-background-color: #ea580c; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 18; -fx-cursor: hand;" />
+        <Button onAction="#handleRegisterArrival" text="🔑 Register Arrival (Check-In)"
+                style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 18; -fx-cursor: hand;" />
+    </HBox>
+
+</VBox>

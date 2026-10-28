@@ -1,41 +1,38 @@
 package org.apache.maven.archetypes.hotelflow.Model;
 
-
 import java.time.LocalDateTime;
 
 public class CheckIn {
     private Long checkInId;
     private Long bookingId;
-    private LocalDateTime checkInDate;
-    private LocalDateTime checkOutDate;
+    private LocalDateTime actualCheckInTime;
+    private LocalDateTime actualCheckOutTime;
     private CheckInStatus status;
-    private String formContent;
 
     public CheckIn() {
-        this.status = CheckInStatus.ACTIVE;
-        this.checkInDate = LocalDateTime.now();
+        this.status = CheckInStatus.CHECKED_IN;
     }
 
-    public CheckIn(Long checkInId, Long bookingId, String formContent) {
+    public CheckIn(Long checkInId, Long bookingId, LocalDateTime actualCheckInTime, LocalDateTime actualCheckOutTime, CheckInStatus status) {
         this.checkInId = checkInId;
         this.bookingId = bookingId;
-        this.formContent = formContent;
-        this.checkInDate = LocalDateTime.now();
-        this.status = CheckInStatus.ACTIVE;
+        this.actualCheckInTime = actualCheckInTime;
+        this.actualCheckOutTime = actualCheckOutTime;
+        this.status = status;
     }
 
-    // Class diyagramındaki iş metotları
+    // İşlem metotları
     public void registerCheckIn() {
-        this.checkInDate = LocalDateTime.now();
-        this.status = CheckInStatus.ACTIVE;
+        this.actualCheckInTime = LocalDateTime.now();
+        this.status = CheckInStatus.CHECKED_IN;
     }
 
     public void registerCheckOut() {
-        this.checkOutDate = LocalDateTime.now();
+        this.actualCheckOutTime = LocalDateTime.now();
         this.status = CheckInStatus.CHECKED_OUT;
     }
 
-    // Getter ve Setter metotları
+    // Getter & Setter Metotları
     public Long getCheckInId() {
         return checkInId;
     }
@@ -52,20 +49,20 @@ public class CheckIn {
         this.bookingId = bookingId;
     }
 
-    public LocalDateTime getCheckInDate() {
-        return checkInDate;
+    public LocalDateTime getActualCheckInTime() {
+        return actualCheckInTime;
     }
 
-    public void setCheckInDate(LocalDateTime checkInDate) {
-        this.checkInDate = checkInDate;
+    public void setActualCheckInTime(LocalDateTime actualCheckInTime) {
+        this.actualCheckInTime = actualCheckInTime;
     }
 
-    public LocalDateTime getCheckOutDate() {
-        return checkOutDate;
+    public LocalDateTime getActualCheckOutTime() {
+        return actualCheckOutTime;
     }
 
-    public void setCheckOutDate(LocalDateTime checkOutDate) {
-        this.checkOutDate = checkOutDate;
+    public void setActualCheckOutTime(LocalDateTime actualCheckOutTime) {
+        this.actualCheckOutTime = actualCheckOutTime;
     }
 
     public CheckInStatus getStatus() {
@@ -74,13 +71,5 @@ public class CheckIn {
 
     public void setStatus(CheckInStatus status) {
         this.status = status;
-    }
-
-    public String getFormContent() {
-        return formContent;
-    }
-
-    public void setFormContent(String formContent) {
-        this.formContent = formContent;
     }
 }

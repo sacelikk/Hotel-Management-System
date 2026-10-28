@@ -97,7 +97,7 @@
                 </padding>
                 <children>
                     <!-- Günün Tarihi Rozeti -->
-                    <Label fx:id="dateLabel" text="18 October 2026" textFill="#e2e8f0">
+                    <Label fx:id="dateLabel" text="" textFill="#e2e8f0">
                         <font>
                             <Font name="System Bold" size="15.0" />
                         </font>
