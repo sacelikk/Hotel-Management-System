@@ -70,6 +70,10 @@ public class DashboardController {
             loadView("reservations-view.fxml");
         }
     }
+    @FXML
+    private void handleReportsClick() {
+        loadView("reports-view.fxml");
+    }
 
     public void loadView(String fxmlFile) {
         try {

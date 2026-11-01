@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox spacing="16.0" style="-fx-background-color: transparent;"
+      xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.apache.maven.archetypes.hotelflow.Controller.ReportsController">
+
+    <!-- Üst Başlık ve Filtre Çubuğu -->
+    <HBox alignment="CENTER_LEFT" spacing="12.0">
+        <VBox HBox.hgrow="ALWAYS">
+            <Label text="Reports &amp; Analytics" textFill="#0f172a">
+                <font>
+                    <Font name="System Bold" size="20.0" />
+                </font>
+            </Label>
+            <Label text="Overview of hotel occupancy rates, booking statuses, and revenue indicators." textFill="#64748b">
+                <font>
+                    <Font size="13.0" />
+                </font>
+            </Label>
+        </VBox>
+
+        <DatePicker fx:id="startDatePicker" promptText="Start Date" prefWidth="140.0"
+                    style="-fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6;" />
+        <DatePicker fx:id="endDatePicker" promptText="End Date" prefWidth="140.0"
+                    style="-fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6;" />
+        <Button onAction="#handleGenerateReport" text="Apply Filters"
+                style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 16; -fx-cursor: hand;" />
+    </HBox>
+
+    <!-- 4 Adet KPI Özet Kartı -->
+    <HBox spacing="14.0">
+        <!-- Kart 1: Toplam Rezervasyon -->
+        <VBox spacing="6.0" HBox.hgrow="ALWAYS"
+              style="-fx-background-color: white; -fx-padding: 16; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+            <Label text="Total Bookings" textFill="#64748b" style="-fx-font-size: 12px; -fx-font-weight: bold;" />
+            <Label fx:id="lblTotalBookings" text="0" textFill="#0f172a">
+                <font>
+                    <Font name="System Bold" size="24.0" />
+                </font>
+            </Label>
+            <Label text="All registered reservations" textFill="#94a3b8" style="-fx-font-size: 11px;" />
+        </VBox>
+
+        <!-- Kart 2: Doluluk Oranı -->
+        <VBox spacing="6.0" HBox.hgrow="ALWAYS"
+              style="-fx-background-color: white; -fx-padding: 16; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+            <Label text="Occupancy Rate" textFill="#64748b" style="-fx-font-size: 12px; -fx-font-weight: bold;" />
+            <Label fx:id="lblOccupancyRate" text="0%" textFill="#0284c7">
+                <font>
+                    <Font name="System Bold" size="24.0" />
+                </font>
+            </Label>
+            <Label text="Based on active check-ins" textFill="#94a3b8" style="-fx-font-size: 11px;" />
+        </VBox>
+
+        <!-- Kart 3: Aktif Misafir -->
+        <VBox spacing="6.0" HBox.hgrow="ALWAYS"
+              style="-fx-background-color: white; -fx-padding: 16; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+            <Label text="Active In-House Guests" textFill="#64748b" style="-fx-font-size: 12px; -fx-font-weight: bold;" />
+            <Label fx:id="lblActiveGuests" text="0" textFill="#16a34a">
+                <font>
+                    <Font name="System Bold" size="24.0" />
+                </font>
+            </Label>
+            <Label text="Currently staying" textFill="#94a3b8" style="-fx-font-size: 11px;" />
+        </VBox>
+
+        <!-- Kart 4: Tahmini Gelir -->
+        <VBox spacing="6.0" HBox.hgrow="ALWAYS"
+              style="-fx-background-color: white; -fx-padding: 16; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+            <Label text="Estimated Revenue" textFill="#64748b" style="-fx-font-size: 12px; -fx-font-weight: bold;" />
+            <Label fx:id="lblEstimatedRevenue" text="€0.00" textFill="#ea580c">
+                <font>
+                    <Font name="System Bold" size="24.0" />
+                </font>
+            </Label>
+            <Label text="Calculated from confirmed stays" textFill="#94a3b8" style="-fx-font-size: 11px;" />
+        </VBox>
+    </HBox>
+
+    <!-- Grafikler Alanı (Pie & Bar Chart) -->
+    <HBox spacing="14.0" VBox.vgrow="ALWAYS">
+        <!-- Pasta Grafik: Rezervasyon Dağılımı -->
+        <VBox HBox.hgrow="ALWAYS" prefWidth="420.0"
+              style="-fx-background-color: white; -fx-padding: 14; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+            <Label text="Booking Status Distribution" textFill="#0f172a" style="-fx-font-weight: bold; -fx-font-size: 14px;" />
+            <PieChart fx:id="bookingStatusPieChart" legendSide="BOTTOM" VBox.vgrow="ALWAYS" />
+        </VBox>
+
+        <!-- Sütun Grafik: Haftalık Rezervasyon Hacmi -->
+        <VBox HBox.hgrow="ALWAYS" prefWidth="540.0"
+              style="-fx-background-color: white; -fx-padding: 14; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+            <Label text="Weekly Booking Activity" textFill="#0f172a" style="-fx-font-weight: bold; -fx-font-size: 14px;" />
+            <BarChart fx:id="weeklyActivityBarChart" legendVisible="false" VBox.vgrow="ALWAYS">
+                <xAxis>
+                    <CategoryAxis label="Day" />
+                </xAxis>
+                <yAxis>
+                    <NumberAxis label="Bookings Count" />
+                </yAxis>
+            </BarChart>
+        </VBox>
+    </HBox>
+
+</VBox>

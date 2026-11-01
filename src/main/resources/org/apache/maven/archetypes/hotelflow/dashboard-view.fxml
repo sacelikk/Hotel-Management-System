@@ -69,7 +69,9 @@
                         style="-fx-background-color: transparent; -fx-text-fill: #cbd5e1; -fx-font-size: 13px; -fx-cursor: hand; -fx-padding: 10 14; -fx-background-radius: 6;"/>
 
                 <!-- Ortak / Rapor Menüsü -->
+                <!-- Ortak / Rapor Menüsü -->
                 <Button fx:id="btnReports" maxWidth="Infinity" alignment="BASELINE_LEFT" text="📊  Reports"
+                        onAction="#handleReportsClick"
                         style="-fx-background-color: transparent; -fx-text-fill: #cbd5e1; -fx-font-size: 13px; -fx-cursor: hand; -fx-padding: 10 14; -fx-background-radius: 6;"/>
             </VBox>
 
