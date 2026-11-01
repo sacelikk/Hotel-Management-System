@@ -29,6 +29,7 @@ public class DashboardController {
     @FXML private Button btnAssignManagers;
     @FXML private Button btnReceptionists;
     @FXML private Button btnServices;
+    @FXML private Button btnRooms;
     @FXML private Button btnReservations;
     @FXML private Button btnCheckIn;
     @FXML private Button btnClients;
@@ -53,6 +54,10 @@ public class DashboardController {
     }
 
     private void setupNavigationActions(Role role) {
+        if (btnRooms != null) {
+            btnRooms.setOnAction(e -> loadView("rooms-view.fxml"));
+        }
+
         if (btnReservations != null) {
             btnReservations.setOnAction(e -> loadView("reservations-view.fxml"));
         }
@@ -61,15 +66,15 @@ public class DashboardController {
             btnCheckIn.setOnAction(e -> loadView("checkin-view.fxml"));
         }
 
-        // Müşteriler butonu bağlantısı:
         if (btnClients != null) {
             btnClients.setOnAction(e -> loadView("clients-view.fxml"));
         }
 
         if (role == Role.RECEPTIONIST) {
-            loadView("reservations-view.fxml");
+            loadView("rooms-view.fxml"); // Receptionist ilk açılışta canlı oda haritasını görsün
         }
     }
+
     @FXML
     private void handleReportsClick() {
         loadView("reports-view.fxml");
@@ -96,14 +101,17 @@ public class DashboardController {
             case OWNER:
                 setButtonVisible(btnHotels, true);
                 setButtonVisible(btnAssignManagers, true);
+                setButtonVisible(btnRooms, true);
                 setButtonVisible(btnReports, true);
                 break;
             case MANAGER:
+                setButtonVisible(btnRooms, true);
                 setButtonVisible(btnReceptionists, true);
                 setButtonVisible(btnServices, true);
                 setButtonVisible(btnReports, true);
                 break;
             case RECEPTIONIST:
+                setButtonVisible(btnRooms, true);
                 setButtonVisible(btnReservations, true);
                 setButtonVisible(btnCheckIn, true);
                 setButtonVisible(btnClients, true);
@@ -118,6 +126,7 @@ public class DashboardController {
         setButtonVisible(btnAssignManagers, false);
         setButtonVisible(btnReceptionists, false);
         setButtonVisible(btnServices, false);
+        setButtonVisible(btnRooms, false);
         setButtonVisible(btnReservations, false);
         setButtonVisible(btnCheckIn, false);
         setButtonVisible(btnClients, false);

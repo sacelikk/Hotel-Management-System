@@ -44,6 +44,23 @@ public class Booking {
         return this.startDate != null && this.endDate != null && this.endDate.isAfter(this.startDate);
     }
 
+    // FR-11: İki rezervasyonun oda ve tarih çakışması kontrolü
+    public boolean conflictsWith(Long targetRoomId, LocalDate targetStart, LocalDate targetEnd) {
+        // İptal edilmiş rezervasyonlar oda doluluğunu engellemez (Business Rules)
+        if (this.status == BookingStatus.CANCELLED) {
+            return false;
+        }
+        if (this.roomId == null || !this.roomId.equals(targetRoomId)) {
+            return false;
+        }
+        if (this.startDate == null || this.endDate == null || targetStart == null || targetEnd == null) {
+            return false;
+        }
+        // İki tarih aralığının çakışma kuralı: [startA, endA) ile [startB, endB)
+        // Giriş ve çıkış aynı gün olamaz; bir misafirin çıkış günü diğerinin giriş günü olabilir.
+        return targetStart.isBefore(this.endDate) && targetEnd.isAfter(this.startDate);
+    }
+
     // FR-10: Rezervasyon iptali
     public void cancel(CancellationType type) {
         this.status = BookingStatus.CANCELLED;

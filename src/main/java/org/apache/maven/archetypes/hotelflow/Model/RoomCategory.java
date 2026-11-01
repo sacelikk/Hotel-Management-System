@@ -7,8 +7,20 @@ public class RoomCategory {
     private String name;
     private double basePrice;
     private int capacity;
-    public void updateprice(){
 
+    public RoomCategory() {}
+
+    public RoomCategory(int roomCategoryId, int hotelId, String name, String description, double basePrice, int capacity) {
+        this.RoomCategoryId = roomCategoryId;
+        this.HotelId = hotelId;
+        this.name = name;
+        this.Description = description;
+        this.basePrice = basePrice;
+        this.capacity = capacity;
+    }
+
+    public void updatePrice(double newPrice) {
+        this.basePrice = newPrice;
     }
 
     public String getName() {
@@ -58,5 +70,4 @@ public class RoomCategory {
     public void setHotelId(int hotelId) {
         HotelId = hotelId;
     }
-
 }

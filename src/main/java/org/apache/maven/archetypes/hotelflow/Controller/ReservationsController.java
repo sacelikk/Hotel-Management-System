@@ -1,20 +1,21 @@
 package org.apache.maven.archetypes.hotelflow.Controller;
 
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import org.apache.maven.archetypes.hotelflow.Model.Booking;
 import org.apache.maven.archetypes.hotelflow.Model.BookingStatus;
 import org.apache.maven.archetypes.hotelflow.Model.BookingType;
 import org.apache.maven.archetypes.hotelflow.Model.CancellationType;
-
+import org.apache.maven.archetypes.hotelflow.Model.CheckIn;
+import org.apache.maven.archetypes.hotelflow.Model.CheckInStatus;
+import org.apache.maven.archetypes.hotelflow.Util.DataStore;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class ReservationsController {
 
@@ -31,13 +32,13 @@ public class ReservationsController {
     @FXML private TableColumn<Booking, BookingStatus> colStatus;
     @FXML private Label tableStatusLabel;
 
-    private final ObservableList<Booking> masterBookingList = FXCollections.observableArrayList();
+    private final ObservableList<Booking> masterBookingList = DataStore.getInstance().getBookings();
     private FilteredList<Booking> filteredBookingList;
 
     @FXML
     public void initialize() {
         setupTableColumns();
-        loadSampleData();
+        loadBookingData();
         setupFilters();
     }
 
@@ -66,7 +67,6 @@ public class ReservationsController {
         colStatus.setCellValueFactory(cellData ->
                 new javafx.beans.property.SimpleObjectProperty<>(cellData.getValue().getStatus()));
 
-        // Durum rozeti renklendirmesi (mevcut kodun devamı)
         colStatus.setCellFactory(col -> new TableCell<Booking, BookingStatus>() {
             @Override
             protected void updateItem(BookingStatus item, boolean empty) {
@@ -86,6 +86,9 @@ public class ReservationsController {
                         case CANCELLED:
                             setStyle("-fx-text-fill: #b91c1c; -fx-font-weight: bold;");
                             break;
+                        case COMPLETED:
+                            setStyle("-fx-text-fill: #64748b; -fx-font-weight: bold;");
+                            break;
                         default:
                             setStyle("-fx-text-fill: #475569;");
                             break;
@@ -95,22 +98,7 @@ public class ReservationsController {
         });
     }
 
-    private void loadSampleData() {
-        // Test amaçlı rezervasyon örnekleri
-        masterBookingList.add(new Booking(1L, "BK-2026-001", 101L, 201L, 4L,
-                BookingType.STANDARD, CancellationType.FREE,
-                LocalDate.now(), LocalDate.now().plusDays(3)));
-
-        masterBookingList.add(new Booking(2L, "BK-2026-002", 102L, 204L, 4L,
-                BookingType.VIP, CancellationType.NON_REFUNDABLE,
-                LocalDate.now().plusDays(1), LocalDate.now().plusDays(5)));
-
-        Booking b3 = new Booking(3L, "BK-2026-003", 103L, 305L, 4L,
-                BookingType.CORPORATE, CancellationType.PARTIAL_REFUND,
-                LocalDate.now().minusDays(2), LocalDate.now().plusDays(1));
-        b3.setStatus(BookingStatus.CHECKED_IN);
-        masterBookingList.add(b3);
-
+    private void loadBookingData() {
         filteredBookingList = new FilteredList<>(masterBookingList, p -> true);
         bookingsTable.setItems(filteredBookingList);
         updateStatusLabel();
@@ -130,7 +118,7 @@ public class ReservationsController {
 
         filteredBookingList.setPredicate(booking -> {
             boolean matchesSearch = searchText.isEmpty()
-                    || booking.getBookingNumber().toLowerCase().contains(searchText)
+                    || (booking.getBookingNumber() != null && booking.getBookingNumber().toLowerCase().contains(searchText))
                     || String.valueOf(booking.getClientId()).contains(searchText);
 
             boolean matchesStatus = statusFilter == null
@@ -151,6 +139,9 @@ public class ReservationsController {
     private void handleResetFilters() {
         searchField.clear();
         statusFilterCombo.setValue("ALL");
+        filteredBookingList.setPredicate(p -> true);
+        bookingsTable.refresh();
+        updateStatusLabel();
     }
 
     @FXML
@@ -167,6 +158,18 @@ public class ReservationsController {
         }
 
         selected.cancel(CancellationType.FREE);
+
+        // Varsa ilgili aktif check-in kaydını çıkış yapılmış olarak sonlandır
+        DataStore.getInstance().getCheckIns().stream()
+                .filter(c -> c.getBookingId() != null && c.getBookingId().equals(selected.getBookingId())
+                        && c.getStatus() == CheckInStatus.CHECKED_IN)
+                .findFirst()
+                .ifPresent(c -> {
+                    c.setStatus(CheckInStatus.CHECKED_OUT);
+                    c.setActualCheckOutTime(LocalDateTime.now());
+                });
+
+        DataStore.getInstance().syncRoomStatuses();
         bookingsTable.refresh();
         showAlert(Alert.AlertType.INFORMATION, "Cancelled", "Booking " + selected.getBookingNumber() + " has been cancelled.");
     }
@@ -179,14 +182,27 @@ public class ReservationsController {
             return;
         }
 
+        if (selected.getStatus() == BookingStatus.CANCELLED) {
+            showAlert(Alert.AlertType.ERROR, "Cannot Check-In", "Cannot check-in: Booking " + selected.getBookingNumber() + " is CANCELLED.");
+            return;
+        }
+
         if (selected.getStatus() == BookingStatus.CHECKED_IN) {
             showAlert(Alert.AlertType.INFORMATION, "Already Checked-In", "Client is already checked-in.");
             return;
         }
 
-        selected.setStatus(BookingStatus.CHECKED_IN);
-        bookingsTable.refresh();
-        showAlert(Alert.AlertType.INFORMATION, "Success", "Check-In registered for booking " + selected.getBookingNumber() + ".");
+        CheckIn checkIn = DataStore.getInstance().performCheckIn(selected.getBookingId());
+
+        if (checkIn != null) {
+            bookingsTable.refresh();
+            showAlert(Alert.AlertType.INFORMATION, "Check-In Success",
+                    "Arrival registered for Booking " + selected.getBookingNumber() + "!\n" +
+                    "Check-In Record #" + checkIn.getCheckInId() + " has been created on Check-In Desk.");
+        } else {
+            showAlert(Alert.AlertType.WARNING, "Already Active",
+                    "Booking " + selected.getBookingNumber() + " is already active in the hotel.");
+        }
     }
 
     @FXML
@@ -198,6 +214,7 @@ public class ReservationsController {
             javafx.scene.Parent root = loader.load();
 
             NewReservationDialogController controller = loader.getController();
+            controller.setAvailableClients(DataStore.getInstance().getClients());
 
             Stage dialogStage = new Stage();
             dialogStage.setTitle("New Reservation - HotelFlow");
@@ -214,8 +231,11 @@ public class ReservationsController {
 
                 newBooking.setBookingId(newId);
                 newBooking.setBookingNumber(bookingNumber);
+                newBooking.setStatus(BookingStatus.CONFIRMED);
 
                 masterBookingList.add(newBooking);
+                DataStore.getInstance().syncRoomStatuses();
+                filteredBookingList.setPredicate(p -> true);
                 bookingsTable.refresh();
                 updateStatusLabel();
 

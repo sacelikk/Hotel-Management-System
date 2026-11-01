@@ -9,9 +9,12 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import org.apache.maven.archetypes.hotelflow.Model.BookingStatus;
+import org.apache.maven.archetypes.hotelflow.Service.ReportService;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
+import java.util.Map;
 
 public class ReportsController {
 
@@ -25,6 +28,8 @@ public class ReportsController {
 
     @FXML private PieChart bookingStatusPieChart;
     @FXML private BarChart<String, Number> weeklyActivityBarChart;
+
+    private final ReportService reportService = new ReportService();
 
     @FXML
     public void initialize() {
@@ -54,51 +59,59 @@ public class ReportsController {
     }
 
     private void updateAnalyticsView(LocalDate start, LocalDate end) {
-        long daysInRange = ChronoUnit.DAYS.between(start, end);
-        if (daysInRange <= 0) daysInRange = 1;
+        ReportService.AnalyticsSummary summary = reportService.computeAnalytics(start, end);
 
-        // Seçilen tarih aralığına göre dinamik hesaplama (Tarih uzadıkça rezervasyon ve gelir artar)
-        int simulatedBookings = (int) Math.max(3, (daysInRange * 1.8));
-        int confirmed = (int) (simulatedBookings * 0.45);
-        int checkedIn = (int) (simulatedBookings * 0.30);
-        int completed = (int) (simulatedBookings * 0.15);
-        int cancelled = Math.max(1, simulatedBookings - (confirmed + checkedIn + completed));
+        // 1. KPI Kartlarını Güncelle
+        lblTotalBookings.setText(String.valueOf(summary.getTotalBookings()));
+        lblOccupancyRate.setText(String.format("%.1f%%", summary.getOccupancyRate()));
+        lblActiveGuests.setText(String.valueOf(summary.getActiveGuests()));
+        lblEstimatedRevenue.setText(String.format("€%,.2f", summary.getTotalRevenue()));
 
-        int totalRooms = 30;
-        int activeGuests = Math.min(totalRooms, checkedIn);
-        double occupancyRate = ((double) activeGuests / totalRooms) * 100.0;
+        // 2. Pasta Grafiğini Güncelle (Booking Status Dağılımı)
+        ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
+        Map<BookingStatus, Integer> statusMap = summary.getStatusDistribution();
 
-        // Ortalama oda gecelik ücreti ~€85 üzerinden gelir hesabı
-        double estimatedRevenue = (confirmed + checkedIn + completed) * 85.0 * Math.min(3, Math.max(1, daysInRange / 5.0));
+        for (Map.Entry<BookingStatus, Integer> entry : statusMap.entrySet()) {
+            if (entry.getValue() > 0) {
+                String labelName = formatStatusLabel(entry.getKey());
+                pieData.add(new PieChart.Data(labelName + " (" + entry.getValue() + ")", entry.getValue()));
+            }
+        }
 
-        // 1. Kartları Güncelle
-        lblTotalBookings.setText(String.valueOf(simulatedBookings));
-        lblOccupancyRate.setText(String.format("%.1f%%", occupancyRate));
-        lblActiveGuests.setText(String.valueOf(activeGuests));
-        lblEstimatedRevenue.setText(String.format("€%,.2f", estimatedRevenue));
-
-        // 2. Pasta Grafiğini Güncelle
-        ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList(
-                new PieChart.Data("Confirmed (" + confirmed + ")", confirmed),
-                new PieChart.Data("Checked-In (" + checkedIn + ")", checkedIn),
-                new PieChart.Data("Completed (" + completed + ")", completed),
-                new PieChart.Data("Cancelled (" + cancelled + ")", cancelled)
-        );
+        if (pieData.isEmpty()) {
+            pieData.add(new PieChart.Data("No Bookings", 1));
+        }
         bookingStatusPieChart.setData(pieData);
 
-        // 3. Aktivite Sütun Grafiğini Güncelle
+        // 3. Aktivite Sütun Grafiğini Güncelle (Haftanın günlerine göre dağılım)
         weeklyActivityBarChart.getData().clear();
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Bookings");
 
-        String[] days = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
-        for (int i = 0; i < days.length; i++) {
-            // Tarih genişliğine göre dağıtılmış gerçekçi sayılar
-            int dailyVolume = Math.max(1, (int) ((simulatedBookings / 7.0) + ((i % 3 == 0) ? 2 : -1)));
-            series.getData().add(new XYChart.Data<>(days[i], dailyVolume));
+        Map<DayOfWeek, Integer> dayMap = summary.getBookingsByDayOfWeek();
+        String[] dayLabels = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+        DayOfWeek[] dayEnums = {
+                DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY,
+                DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY
+        };
+
+        for (int i = 0; i < dayLabels.length; i++) {
+            int count = dayMap.getOrDefault(dayEnums[i], 0);
+            series.getData().add(new XYChart.Data<>(dayLabels[i], count));
         }
 
         weeklyActivityBarChart.getData().add(series);
+    }
+
+    private String formatStatusLabel(BookingStatus status) {
+        switch (status) {
+            case CONFIRMED: return "Confirmed";
+            case CHECKED_IN: return "Checked-In";
+            case COMPLETED: return "Completed";
+            case CANCELLED: return "Cancelled";
+            case PENDING: return "Pending";
+            default: return status.name();
+        }
     }
 
     private void showAlert(Alert.AlertType type, String title, String msg) {

@@ -2,13 +2,15 @@ package org.apache.maven.archetypes.hotelflow.Controller;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import org.apache.maven.archetypes.hotelflow.Model.Booking;
+import org.apache.maven.archetypes.hotelflow.Model.BookingStatus;
 import org.apache.maven.archetypes.hotelflow.Model.CheckIn;
 import org.apache.maven.archetypes.hotelflow.Model.CheckInStatus;
+import org.apache.maven.archetypes.hotelflow.Util.DataStore;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -25,21 +27,25 @@ public class CheckInController {
     @FXML private TableColumn<CheckIn, CheckInStatus> colStatus;
     @FXML private Label statusMessageLabel;
 
-    private final ObservableList<CheckIn> masterList = FXCollections.observableArrayList();
+    private final ObservableList<CheckIn> masterList = DataStore.getInstance().getCheckIns();
     private FilteredList<CheckIn> filteredList;
     private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
     @FXML
     public void initialize() {
         setupColumns();
-        loadMockStays();
+        loadFrontDeskData();
         setupSearch();
     }
 
     private void setupColumns() {
         colCheckInId.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getCheckInId()));
         colBookingId.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getBookingId()));
-        colRoomNumber.setCellValueFactory(data -> new SimpleStringProperty("Room #" + (200 + data.getValue().getBookingId())));
+        colRoomNumber.setCellValueFactory(data -> {
+            Long bId = data.getValue().getBookingId();
+            Booking booking = DataStore.getInstance().findBookingById(bId);
+            return new SimpleStringProperty(booking != null ? "Room #" + booking.getRoomId() : "Room #" + (200 + bId));
+        });
 
         colCheckInTime.setCellValueFactory(data -> {
             LocalDateTime time = data.getValue().getActualCheckInTime();
@@ -74,12 +80,7 @@ public class CheckInController {
         });
     }
 
-    private void loadMockStays() {
-        CheckIn c1 = new CheckIn(1L, 1L, LocalDateTime.now().minusDays(1), null, CheckInStatus.CHECKED_IN);
-        CheckIn c2 = new CheckIn(2L, 2L, LocalDateTime.now().minusDays(2), LocalDateTime.now().minusHours(4), CheckInStatus.CHECKED_OUT);
-        CheckIn c3 = new CheckIn(3L, 3L, LocalDateTime.now().minusHours(3), null, CheckInStatus.CHECKED_IN);
-
-        masterList.addAll(c1, c2, c3);
+    private void loadFrontDeskData() {
         filteredList = new FilteredList<>(masterList, p -> true);
         checkInTable.setItems(filteredList);
         updateStatus("Displaying " + filteredList.size() + " front desk records.");
@@ -97,11 +98,49 @@ public class CheckInController {
 
     @FXML
     private void handleRegisterArrival() {
-        long newId = masterList.size() + 1;
-        CheckIn arrival = new CheckIn(newId, 100L + newId, LocalDateTime.now(), null, CheckInStatus.CHECKED_IN);
-        masterList.add(arrival);
-        checkInTable.refresh();
-        updateStatus("New arrival registered: Room Key assigned for Booking #" + arrival.getBookingId());
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Register Guest Arrival");
+        dialog.setHeaderText("Front Desk Check-In");
+        dialog.setContentText("Enter Booking ID (e.g., 1, 2, 4):");
+
+        dialog.showAndWait().ifPresent(input -> {
+            String trimmed = input.trim();
+            if (trimmed.isEmpty()) return;
+
+            Long bookingId;
+            try {
+                bookingId = Long.parseLong(trimmed);
+            } catch (NumberFormatException e) {
+                showAlert(Alert.AlertType.ERROR, "Invalid Input", "Booking ID must be a numeric value.");
+                return;
+            }
+
+            Booking matchedBooking = DataStore.getInstance().findBookingById(bookingId);
+            if (matchedBooking == null) {
+                showAlert(Alert.AlertType.ERROR, "Not Found",
+                        "Booking ID #" + bookingId + " not found in reservations system!");
+                return;
+            }
+
+            if (matchedBooking.getStatus() == BookingStatus.CANCELLED) {
+                showAlert(Alert.AlertType.ERROR, "Reservation Cancelled",
+                        "Cannot check-in: Booking #" + bookingId + " is CANCELLED.");
+                return;
+            }
+
+            CheckIn arrival = DataStore.getInstance().performCheckIn(bookingId);
+            if (arrival == null) {
+                showAlert(Alert.AlertType.WARNING, "Already Active",
+                        "Booking #" + bookingId + " is already active in the hotel.");
+                return;
+            }
+
+            searchField.clear();
+            filteredList.setPredicate(p -> true);
+            checkInTable.refresh();
+
+            updateStatus("Arrival registered: Room key assigned for Booking #" + bookingId + " (" + matchedBooking.getBookingNumber() + ")");
+        });
     }
 
     @FXML
@@ -117,17 +156,20 @@ public class CheckInController {
             return;
         }
 
-        selected.setActualCheckOutTime(LocalDateTime.now());
-        selected.setStatus(CheckInStatus.CHECKED_OUT);
-        checkInTable.refresh();
-        updateStatus("Check-Out completed for Booking #" + selected.getBookingId() + ". Room marked for cleaning/available.");
+        boolean ok = DataStore.getInstance().performCheckOut(selected.getCheckInId());
+        if (ok) {
+            checkInTable.refresh();
+            updateStatus("Check-Out completed for Booking #" + selected.getBookingId() + ". Room marked for cleaning/available.");
+        }
     }
 
     @FXML
     private void handleRefresh() {
         searchField.clear();
+        filteredList.setPredicate(p -> true);
+        checkInTable.setItems(filteredList);
         checkInTable.refresh();
-        updateStatus("Records refreshed.");
+        updateStatus("Records refreshed. Total records: " + masterList.size());
     }
 
     private void updateStatus(String msg) {

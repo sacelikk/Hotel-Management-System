@@ -60,6 +60,10 @@
                 <Button fx:id="btnServices" maxWidth="Infinity" alignment="BASELINE_LEFT" text="🛎️  Seasonal Services"
                         style="-fx-background-color: transparent; -fx-text-fill: #cbd5e1; -fx-font-size: 13px; -fx-cursor: hand; -fx-padding: 10 14; -fx-background-radius: 6;"/>
 
+                <!-- Odalar ve Canlı Durum Menüsü -->
+                <Button fx:id="btnRooms" maxWidth="Infinity" alignment="BASELINE_LEFT" text="🛏️  Rooms &amp; Status"
+                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e1; -fx-font-size: 13px; -fx-cursor: hand; -fx-padding: 10 14; -fx-background-radius: 6;"/>
+
                 <!-- Receptionist Menüleri -->
                 <Button fx:id="btnReservations" maxWidth="Infinity" alignment="BASELINE_LEFT" text="📅  Reservations"
                         style="-fx-background-color: transparent; -fx-text-fill: #cbd5e1; -fx-font-size: 13px; -fx-cursor: hand; -fx-padding: 10 14; -fx-background-radius: 6;"/>
@@ -68,7 +72,6 @@
                 <Button fx:id="btnClients" maxWidth="Infinity" alignment="BASELINE_LEFT" text="👤  Clients"
                         style="-fx-background-color: transparent; -fx-text-fill: #cbd5e1; -fx-font-size: 13px; -fx-cursor: hand; -fx-padding: 10 14; -fx-background-radius: 6;"/>
 
-                <!-- Ortak / Rapor Menüsü -->
                 <!-- Ortak / Rapor Menüsü -->
                 <Button fx:id="btnReports" maxWidth="Infinity" alignment="BASELINE_LEFT" text="📊  Reports"
                         onAction="#handleReportsClick"
