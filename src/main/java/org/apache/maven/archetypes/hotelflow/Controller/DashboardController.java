@@ -70,6 +70,10 @@ public class DashboardController {
             btnClients.setOnAction(e -> loadView("clients-view.fxml"));
         }
 
+        if (btnServices != null) {
+            btnServices.setOnAction(e -> loadView("services-view.fxml"));
+        }
+
         if (role == Role.RECEPTIONIST) {
             loadView("rooms-view.fxml"); // Receptionist ilk açılışta canlı oda haritasını görsün
         }
@@ -97,11 +101,13 @@ public class DashboardController {
         switch (role) {
             case ADMINISTRATOR:
                 setButtonVisible(btnManageOwners, true);
+                setButtonVisible(btnServices, true);
                 break;
             case OWNER:
                 setButtonVisible(btnHotels, true);
                 setButtonVisible(btnAssignManagers, true);
                 setButtonVisible(btnRooms, true);
+                setButtonVisible(btnServices, true);
                 setButtonVisible(btnReports, true);
                 break;
             case MANAGER:
@@ -115,6 +121,7 @@ public class DashboardController {
                 setButtonVisible(btnReservations, true);
                 setButtonVisible(btnCheckIn, true);
                 setButtonVisible(btnClients, true);
+                setButtonVisible(btnServices, true);
                 setButtonVisible(btnReports, true);
                 break;
         }

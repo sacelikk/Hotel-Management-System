@@ -1,7 +1,5 @@
 package org.apache.maven.archetypes.hotelflow.Model;
 
-
-
 import java.math.BigDecimal;
 
 public class Service {
@@ -24,7 +22,7 @@ public class Service {
         this.name = name;
         this.description = description;
         this.price = price;
-        this.season = season;
+        this.season = season != null ? season : Season.ALL_YEAR;
         this.active = true;
     }
 
@@ -38,6 +36,15 @@ public class Service {
     public boolean isAvailableInSeason(Season currentSeason) {
         if (!this.active) return false;
         return this.season == Season.ALL_YEAR || this.season == currentSeason;
+    }
+
+    public boolean isAvailableNow() {
+        return isAvailableInSeason(Season.getCurrentSeason());
+    }
+
+    public String getFormattedPrice() {
+        if (price == null) return "€0.00";
+        return String.format(java.util.Locale.US, "€%.2f", price);
     }
 
     public Long getServiceId() { return serviceId; }
@@ -60,4 +67,9 @@ public class Service {
 
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
+
+    @Override
+    public String toString() {
+        return name + " (" + getFormattedPrice() + " - " + season + ")";
+    }
 }

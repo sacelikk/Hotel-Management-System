@@ -15,6 +15,8 @@ public class DataStore {
     private final ObservableList<CheckIn> checkIns = FXCollections.observableArrayList();
     private final ObservableList<Client> clients = FXCollections.observableArrayList();
     private final ObservableList<Room> rooms = FXCollections.observableArrayList();
+    private final ObservableList<Service> services = FXCollections.observableArrayList();
+    private final ObservableList<ServiceUsage> serviceUsages = FXCollections.observableArrayList();
 
     private DataStore() {
         initSampleData();
@@ -32,6 +34,8 @@ public class DataStore {
         checkIns.clear();
         clients.clear();
         rooms.clear();
+        services.clear();
+        serviceUsages.clear();
         initSampleData();
     }
 
@@ -75,6 +79,21 @@ public class DataStore {
 
         // 5. Odaların doluluk durumlarını rezervasyonlara göre senkronize et
         syncRoomStatuses();
+
+        // 6. Ortak Sezonluk Ek Hizmetler (FR-13)
+        Service s1 = new Service(1L, 1L, "Thermal Spa & Massage", "Full body thermal spa and hot stone relaxation massage", new java.math.BigDecimal("45.00"), Season.ALL_YEAR);
+        Service s2 = new Service(2L, 1L, "Outdoor Infinity Pool & Bar", "Access to heated outdoor infinity pool and cocktails", new java.math.BigDecimal("25.00"), Season.SUMMER);
+        Service s3 = new Service(3L, 1L, "Ski Gear & Mountain Shuttle", "Full ski/snowboard equipment and mountain slope shuttle", new java.math.BigDecimal("60.00"), Season.WINTER);
+        Service s4 = new Service(4L, 1L, "Buffet Breakfast Premium", "Continental & English open buffet with fresh organic beverages", new java.math.BigDecimal("18.00"), Season.ALL_YEAR);
+        Service s5 = new Service(5L, 1L, "Airport VIP Transfer", "Private luxury two-way airport transfer service", new java.math.BigDecimal("50.00"), Season.ALL_YEAR);
+        Service s6 = new Service(6L, 1L, "Autumn Forest Guided Tour", "Mountain guided hiking, photography and local wine tasting", new java.math.BigDecimal("35.00"), Season.AUTUMN);
+        services.addAll(s1, s2, s3, s4, s5, s6);
+
+        // 7. Ortak Hizmet Kullanımları
+        ServiceUsage u1 = new ServiceUsage(1L, 1L, 101L, 2, new java.math.BigDecimal("45.00")); // Alex Schmidt -> 2x Spa
+        ServiceUsage u2 = new ServiceUsage(2L, 4L, 104L, 3, new java.math.BigDecimal("18.00")); // Sophia Rossi -> 3x Breakfast
+        ServiceUsage u3 = new ServiceUsage(3L, 5L, 102L, 1, new java.math.BigDecimal("50.00")); // Elena Popova -> 1x VIP Transfer
+        serviceUsages.addAll(u1, u2, u3);
     }
 
     public ObservableList<Booking> getBookings() {
@@ -243,5 +262,67 @@ public class DataStore {
             return false;
         }
         return findConflictingBooking(roomId, checkIn, checkOut, excludeBookingId) == null;
+    }
+
+    // ==========================================
+    // FR-13: Seasonal Additional Services & Usages
+    // ==========================================
+
+    public ObservableList<Service> getServices() {
+        return services;
+    }
+
+    public ObservableList<ServiceUsage> getServiceUsages() {
+        return serviceUsages;
+    }
+
+    public Service findServiceById(Long id) {
+        if (id == null) return null;
+        return services.stream()
+                .filter(s -> s.getServiceId() != null && s.getServiceId().equals(id))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public void addService(Service service) {
+        if (service != null) {
+            this.services.add(service);
+        }
+    }
+
+    public void addServiceUsage(ServiceUsage usage) {
+        if (usage != null) {
+            this.serviceUsages.add(usage);
+        }
+    }
+
+    /**
+     * FR-13 & Business Rule: Records a guest's service usage, ensuring the service is available in the current season.
+     * Returns the created ServiceUsage, or null if service is out of season and override is false.
+     */
+    public ServiceUsage recordServiceUsage(Long serviceId, Long clientId, int quantity, boolean allowOutOfSeason) {
+        if (serviceId == null || clientId == null || quantity <= 0) {
+            return null;
+        }
+
+        Service service = findServiceById(serviceId);
+        Client client = findClientById(clientId);
+        if (service == null || client == null || !service.isActive()) {
+            return null;
+        }
+
+        if (!allowOutOfSeason && !service.isAvailableNow()) {
+            return null; // Business rule: Seasonal services shall only be provided within their configured availability periods
+        }
+
+        long maxId = serviceUsages.stream()
+                .mapToLong(u -> u.getUsageId() != null ? u.getUsageId() : 0L)
+                .max()
+                .orElse(0L);
+        long newId = maxId + 1;
+
+        ServiceUsage usage = new ServiceUsage(newId, serviceId, clientId, quantity, service.getPrice());
+        serviceUsages.add(usage);
+        return usage;
     }
 }

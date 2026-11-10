@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox spacing="16.0" style="-fx-background-color: transparent;"
+      xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.apache.maven.archetypes.hotelflow.Controller.ServicesController">
+
+    <!-- Üst Başlık ve Eylem Butonları -->
+    <HBox alignment="CENTER_LEFT" spacing="12.0">
+        <VBox HBox.hgrow="ALWAYS">
+            <Label text="Seasonal Hotel Services &amp; Guest Usages (FR-13)" textFill="#0f172a">
+                <font>
+                    <Font name="System Bold" size="20.0" />
+                </font>
+            </Label>
+            <Label text="Configure seasonal services, pricing policies, and log service charges for staying guests." textFill="#64748b">
+                <font>
+                    <Font size="13.0" />
+                </font>
+            </Label>
+        </VBox>
+
+        <HBox spacing="8.0">
+            <Button onAction="#handleNewService" text="+ Add New Service"
+                    style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 16; -fx-cursor: hand;" />
+            <Button onAction="#handleRecordUsage" text="+ Record Guest Usage"
+                    style="-fx-background-color: #059669; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 16; -fx-cursor: hand;" />
+        </HBox>
+    </HBox>
+
+    <!-- KPI Sayaç Kartları -->
+    <HBox spacing="12.0">
+        <HBox spacing="8.0" alignment="CENTER_LEFT"
+              style="-fx-background-color: white; -fx-padding: 10 16; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+            <Label text="Total Services:" textFill="#64748b" style="-fx-font-size: 12px; -fx-font-weight: bold;" />
+            <Label fx:id="lblTotalServices" text="0" textFill="#0f172a" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+        </HBox>
+
+        <HBox spacing="8.0" alignment="CENTER_LEFT"
+              style="-fx-background-color: white; -fx-padding: 10 16; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+            <Label text="Available In-Season:" textFill="#15803d" style="-fx-font-size: 12px; -fx-font-weight: bold;" />
+            <Label fx:id="lblInSeasonServices" text="0" textFill="#15803d" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+        </HBox>
+
+        <HBox spacing="8.0" alignment="CENTER_LEFT"
+              style="-fx-background-color: white; -fx-padding: 10 16; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+            <Label text="Recorded Usages:" textFill="#2563eb" style="-fx-font-size: 12px; -fx-font-weight: bold;" />
+            <Label fx:id="lblTotalUsages" text="0" textFill="#2563eb" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+        </HBox>
+
+        <HBox spacing="8.0" alignment="CENTER_LEFT"
+              style="-fx-background-color: white; -fx-padding: 10 16; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+            <Label text="Service Revenue:" textFill="#0f172a" style="-fx-font-size: 12px; -fx-font-weight: bold;" />
+            <Label fx:id="lblServiceRevenue" text="€0.00" textFill="#0f172a" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+        </HBox>
+
+        <Region HBox.hgrow="ALWAYS" />
+
+        <HBox alignment="CENTER"
+              style="-fx-background-color: #f8fafc; -fx-padding: 10 16; -fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8;">
+            <Label fx:id="lblCurrentSeasonBadge" text="Active Season: AUTUMN" textFill="#475569"
+                   style="-fx-font-size: 12px; -fx-font-weight: bold;" />
+        </HBox>
+    </HBox>
+
+    <!-- Filtreleme Çubuğu -->
+    <HBox alignment="CENTER_LEFT" spacing="12.0"
+          style="-fx-background-color: white; -fx-padding: 12 16; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+        <TextField fx:id="searchField" promptText="Search by service name, description or guest..." prefWidth="300.0"
+                   style="-fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-padding: 6 10;" />
+
+        <ComboBox fx:id="seasonFilterCombo" promptText="Season" prefWidth="140.0"
+                  style="-fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6;" />
+
+        <ComboBox fx:id="statusFilterCombo" promptText="Status" prefWidth="140.0"
+                  style="-fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6;" />
+
+        <Region HBox.hgrow="ALWAYS" />
+
+        <Button onAction="#handleResetFilters" text="Reset Filters"
+                style="-fx-background-color: #f1f5f9; -fx-text-fill: #475569; -fx-background-radius: 6; -fx-cursor: hand; -fx-padding: 6 14;" />
+        <Button onAction="#handleRefresh" text="Refresh"
+                style="-fx-background-color: #e2e8f0; -fx-text-fill: #334155; -fx-background-radius: 6; -fx-cursor: hand; -fx-padding: 6 14;" />
+    </HBox>
+
+    <!-- Ana İçerik: Sekmeli TabPane -->
+    <TabPane VBox.vgrow="ALWAYS" tabClosingPolicy="UNAVAILABLE"
+             style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+
+        <!-- Sekme 1: Otel Hizmetleri Kataloğu -->
+        <Tab text="  Service Catalog &amp; Seasonal Rates  ">
+            <VBox spacing="10.0" style="-fx-padding: 12;">
+                <HBox alignment="CENTER_RIGHT" spacing="8.0">
+                    <Label text="Select a service row to toggle active state or view seasonal details:" textFill="#64748b" style="-fx-font-size: 11px;" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button onAction="#handleToggleActive" text="Toggle Active / Inactive"
+                            style="-fx-background-color: #f8fafc; -fx-border-color: #cbd5e1; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 4 10; -fx-cursor: hand; -fx-font-size: 11px;" />
+                </HBox>
+
+                <TableView fx:id="servicesTable" VBox.vgrow="ALWAYS"
+                           style="-fx-background-radius: 6; -fx-border-color: #e2e8f0; -fx-border-radius: 6;">
+                    <columns>
+                        <TableColumn fx:id="colServiceId" text="ID" prefWidth="55.0" />
+                        <TableColumn fx:id="colServiceName" text="Service Name" prefWidth="200.0" />
+                        <TableColumn fx:id="colDescription" text="Description" prefWidth="280.0" />
+                        <TableColumn fx:id="colSeason" text="Season Schedule" prefWidth="150.0" />
+                        <TableColumn fx:id="colPrice" text="Unit Price" prefWidth="100.0" />
+                        <TableColumn fx:id="colAvailability" text="Current Season Status" prefWidth="160.0" />
+                        <TableColumn fx:id="colActive" text="Active State" prefWidth="100.0" />
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                    </columnResizePolicy>
+                </TableView>
+            </VBox>
+        </Tab>
+
+        <!-- Sekme 2: Misafir Kullanım & Harcama Kayıtları -->
+        <Tab text="  Guest Usage Records &amp; Charges  ">
+            <VBox spacing="10.0" style="-fx-padding: 12;">
+                <HBox alignment="CENTER_RIGHT" spacing="8.0">
+                    <Label text="Logged service consumptions linked to guest accounts and hotel revenue:" textFill="#64748b" style="-fx-font-size: 11px;" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button onAction="#handleDeleteUsage" text="Remove Usage Entry"
+                            style="-fx-background-color: #fef2f2; -fx-text-fill: #dc2626; -fx-border-color: #fecaca; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 4 10; -fx-cursor: hand; -fx-font-size: 11px;" />
+                </HBox>
+
+                <TableView fx:id="usagesTable" VBox.vgrow="ALWAYS"
+                           style="-fx-background-radius: 6; -fx-border-color: #e2e8f0; -fx-border-radius: 6;">
+                    <columns>
+                        <TableColumn fx:id="colUsageId" text="Record #" prefWidth="70.0" />
+                        <TableColumn fx:id="colUsageDate" text="Date &amp; Time" prefWidth="140.0" />
+                        <TableColumn fx:id="colClient" text="Guest (Client)" prefWidth="200.0" />
+                        <TableColumn fx:id="colUsageServiceName" text="Service Consumed" prefWidth="220.0" />
+                        <TableColumn fx:id="colQuantity" text="Quantity" prefWidth="80.0" />
+                        <TableColumn fx:id="colUsageUnitPrice" text="Unit Price" prefWidth="100.0" />
+                        <TableColumn fx:id="colUsageTotalPrice" text="Total Charged" prefWidth="120.0" />
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                    </columnResizePolicy>
+                </TableView>
+            </VBox>
+        </Tab>
+    </TabPane>
+
+    <!-- Alt Bilgi / Durum Çubuğu -->
+    <HBox alignment="CENTER_LEFT" spacing="8.0" style="-fx-padding: 4 8;">
+        <Label fx:id="statusMessageLabel" text="Ready." textFill="#64748b" style="-fx-font-size: 12px;" />
+    </HBox>
+
+</VBox>

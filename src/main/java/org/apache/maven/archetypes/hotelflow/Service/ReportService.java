@@ -195,9 +195,54 @@ public class ReportService {
             long clientBookings = dataStore.getBookings().stream()
                     .filter(b -> b.getClientId() != null && b.getClientId().equals(c.getClientId()))
                     .count();
-            sb.append("  Total Bookings: ").append(clientBookings).append("\n\n");
+            sb.append("  Total Bookings: ").append(clientBookings).append("\n");
+
+            List<ServiceUsage> clientUsages = dataStore.getServiceUsages().stream()
+                    .filter(u -> u.getClientId() != null && u.getClientId().equals(c.getClientId()))
+                    .collect(Collectors.toList());
+            if (!clientUsages.isEmpty()) {
+                sb.append("  Additional Services Used:\n");
+                for (ServiceUsage u : clientUsages) {
+                    Service s = dataStore.findServiceById(u.getServiceId());
+                    String sName = s != null ? s.getName() : "Service #" + u.getServiceId();
+                    sb.append("    - ").append(sName).append(" (x").append(u.getQuantity()).append(", Total: ").append(u.getFormattedTotalPrice()).append(")\n");
+                }
+            } else {
+                sb.append("  Additional Services Used: None\n");
+            }
+            sb.append("\n");
         }
 
         return new Report(System.currentTimeMillis(), "Client History Report", sb.toString());
+    }
+
+    /**
+     * FR-13 & Acceptance Criteria 8: Seasonal Services & Usage Report generator
+     */
+    public Report generateSeasonalServicesReport() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== SEASONAL ADDITIONAL SERVICES REPORT ===\n");
+        sb.append("Active Current Season: ").append(Season.getCurrentSeason().getDisplayName()).append("\n\n");
+
+        sb.append("--- Service Catalog & Usage Statistics ---\n");
+        for (Service s : dataStore.getServices()) {
+            int uses = dataStore.getServiceUsages().stream()
+                    .filter(u -> u.getServiceId() != null && u.getServiceId().equals(s.getServiceId()))
+                    .mapToInt(ServiceUsage::getQuantity)
+                    .sum();
+
+            sb.append(String.format("• %s [%s]\n", s.getName(), s.getSeason().getDisplayName()));
+            sb.append(String.format("   Price: %s | In-Season Now: %s | Times Consumed: %d\n",
+                    s.getFormattedPrice(), s.isAvailableNow() ? "YES" : "NO (Out of Season)", uses));
+        }
+
+        double totalRevenue = dataStore.getServiceUsages().stream()
+                .map(ServiceUsage::getTotalPrice)
+                .filter(Objects::nonNull)
+                .mapToDouble(p -> p.doubleValue())
+                .sum();
+
+        sb.append(String.format("\nTotal Additional Service Revenue: €%.2f\n", totalRevenue));
+        return new Report(System.currentTimeMillis(), "Seasonal Services & Usage Report", sb.toString());
     }
 }

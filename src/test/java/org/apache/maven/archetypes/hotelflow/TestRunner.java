@@ -14,7 +14,8 @@ public class TestRunner {
         Class<?>[] testClasses = {
                 BookingConflictTest.class,
                 DataStoreSyncTest.class,
-                ReportServiceTest.class
+                ReportServiceTest.class,
+                SeasonalServiceTest.class
         };
 
         int totalTests = 0;
