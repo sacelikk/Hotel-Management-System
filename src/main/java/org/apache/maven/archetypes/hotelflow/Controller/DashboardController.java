@@ -54,6 +54,22 @@ public class DashboardController {
     }
 
     private void setupNavigationActions(Role role) {
+        if (btnManageOwners != null) {
+            btnManageOwners.setOnAction(e -> loadUsersView(Role.OWNER));
+        }
+
+        if (btnReceptionists != null) {
+            btnReceptionists.setOnAction(e -> loadUsersView(Role.RECEPTIONIST));
+        }
+
+        if (btnHotels != null) {
+            btnHotels.setOnAction(e -> loadView("hotels-view.fxml"));
+        }
+
+        if (btnAssignManagers != null) {
+            btnAssignManagers.setOnAction(e -> loadView("hotels-view.fxml"));
+        }
+
         if (btnRooms != null) {
             btnRooms.setOnAction(e -> loadView("rooms-view.fxml"));
         }
@@ -74,8 +90,28 @@ public class DashboardController {
             btnServices.setOnAction(e -> loadView("services-view.fxml"));
         }
 
-        if (role == Role.RECEPTIONIST) {
-            loadView("rooms-view.fxml"); // Receptionist ilk açılışta canlı oda haritasını görsün
+        // Rol bazlı ilk karşılama görünümü
+        if (role == Role.ADMINISTRATOR) {
+            loadUsersView(Role.OWNER);
+        } else if (role == Role.OWNER) {
+            loadView("hotels-view.fxml");
+        } else {
+            loadView("rooms-view.fxml");
+        }
+    }
+
+    public void loadUsersView(Role targetRole) {
+        try {
+            FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("users-management-view.fxml"));
+            Node node = loader.load();
+            UsersManagementController controller = loader.getController();
+            if (controller != null && targetRole != null) {
+                controller.setRoleFilter(targetRole);
+            }
+            contentArea.getChildren().setAll(node);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Görünüm yüklenemedi: users-management-view.fxml");
         }
     }
 
@@ -101,7 +137,10 @@ public class DashboardController {
         switch (role) {
             case ADMINISTRATOR:
                 setButtonVisible(btnManageOwners, true);
+                setButtonVisible(btnHotels, true);
+                setButtonVisible(btnRooms, true);
                 setButtonVisible(btnServices, true);
+                setButtonVisible(btnReports, true);
                 break;
             case OWNER:
                 setButtonVisible(btnHotels, true);

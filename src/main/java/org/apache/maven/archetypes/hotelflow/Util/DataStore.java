@@ -17,6 +17,9 @@ public class DataStore {
     private final ObservableList<Room> rooms = FXCollections.observableArrayList();
     private final ObservableList<Service> services = FXCollections.observableArrayList();
     private final ObservableList<ServiceUsage> serviceUsages = FXCollections.observableArrayList();
+    private final ObservableList<User> users = FXCollections.observableArrayList();
+    private final ObservableList<Hotel> hotels = FXCollections.observableArrayList();
+    private final ObservableList<RoomCategory> roomCategories = FXCollections.observableArrayList();
 
     private DataStore() {
         initSampleData();
@@ -36,6 +39,9 @@ public class DataStore {
         rooms.clear();
         services.clear();
         serviceUsages.clear();
+        users.clear();
+        hotels.clear();
+        roomCategories.clear();
         initSampleData();
     }
 
@@ -52,6 +58,7 @@ public class DataStore {
         RoomCategory standardCat = new RoomCategory(1, 1, "Standard", "Comfortable standard room", 85.0, 2);
         RoomCategory deluxeCat = new RoomCategory(2, 1, "Deluxe", "Spacious room with balcony", 130.0, 3);
         RoomCategory suiteCat = new RoomCategory(3, 1, "Suite", "Luxury suite with panoramic view", 220.0, 4);
+        roomCategories.addAll(standardCat, deluxeCat, suiteCat);
 
         Room r201 = new Room(201L, 1L, standardCat, "201", 2, RoomStatus.AVAILABLE);
         Room r202 = new Room(202L, 1L, standardCat, "202", 2, RoomStatus.AVAILABLE);
@@ -94,6 +101,18 @@ public class DataStore {
         ServiceUsage u2 = new ServiceUsage(2L, 4L, 104L, 3, new java.math.BigDecimal("18.00")); // Sophia Rossi -> 3x Breakfast
         ServiceUsage u3 = new ServiceUsage(3L, 5L, 102L, 1, new java.math.BigDecimal("50.00")); // Elena Popova -> 1x VIP Transfer
         serviceUsages.addAll(u1, u2, u3);
+
+        // 8. Sistem Kullanıcıları (Admin, Owner, Manager, Receptionist)
+        User uAdmin = new User(1L, "admin", "123", "System Administrator", "admin@hotelflow.com", Role.ADMINISTRATOR);
+        User uOwner = new User(2L, "owner", "123", "Alexander Vance (Owner)", "owner@hotelflow.com", Role.OWNER);
+        User uManager = new User(3L, "manager", "123", "Viktor Stoyanov (Manager)", "manager@hotelflow.com", Role.MANAGER, 1L);
+        User uReceptionist = new User(4L, "receptionist", "123", "Maria Petrova (Front Desk)", "receptionist@hotelflow.com", Role.RECEPTIONIST, 1L);
+        users.addAll(uAdmin, uOwner, uManager, uReceptionist);
+
+        // 9. Sistem Otelleri (FR-04, FR-05)
+        Hotel h1 = new Hotel(1L, 2L, 3L, "Grand Varna Palace", "14 Primorski Blvd, Varna", "+359 52 123456", "grand@hotelflow.bg");
+        Hotel h2 = new Hotel(2L, 2L, null, "Black Sea Luxury Resort", "Golden Sands Resort, Varna", "+359 52 654321", "resort@hotelflow.bg");
+        hotels.addAll(h1, h2);
     }
 
     public ObservableList<Booking> getBookings() {
@@ -324,5 +343,91 @@ public class DataStore {
         ServiceUsage usage = new ServiceUsage(newId, serviceId, clientId, quantity, service.getPrice());
         serviceUsages.add(usage);
         return usage;
+    }
+
+    // ==========================================
+    // FR-03, FR-04, FR-05, FR-06: Users, Hotels, Categories
+    // ==========================================
+
+    public ObservableList<User> getUsers() {
+        return users;
+    }
+
+    public ObservableList<Hotel> getHotels() {
+        return hotels;
+    }
+
+    public ObservableList<RoomCategory> getRoomCategories() {
+        return roomCategories;
+    }
+
+    public User findUserById(Long id) {
+        if (id == null) return null;
+        return users.stream()
+                .filter(u -> u.getUserId() != null && u.getUserId().equals(id))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public User findUserByUsername(String username) {
+        if (username == null) return null;
+        return users.stream()
+                .filter(u -> u.getUsername() != null && u.getUsername().equalsIgnoreCase(username.trim()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Hotel findHotelById(Long id) {
+        if (id == null) return null;
+        return hotels.stream()
+                .filter(h -> h.getHotelId() != null && h.getHotelId().equals(id))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public RoomCategory findRoomCategoryById(int id) {
+        return roomCategories.stream()
+                .filter(rc -> rc.getRoomCategoryId() == id)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public void addUser(User user) {
+        if (user != null) {
+            this.users.add(user);
+        }
+    }
+
+    public void addHotel(Hotel hotel) {
+        if (hotel != null) {
+            this.hotels.add(hotel);
+        }
+    }
+
+    public boolean assignManagerToHotel(Long hotelId, Long managerId) {
+        Hotel hotel = findHotelById(hotelId);
+        if (hotel == null) return false;
+        hotel.setManagerId(managerId);
+
+        if (managerId != null) {
+            User manager = findUserById(managerId);
+            if (manager != null) {
+                manager.setHotelId(hotelId);
+            }
+        }
+        return true;
+    }
+
+    public boolean updateRoomCategoryPrice(int categoryId, double newPrice) {
+        RoomCategory cat = findRoomCategoryById(categoryId);
+        if (cat == null || newPrice < 0) return false;
+
+        cat.updatePrice(newPrice);
+        for (Room r : rooms) {
+            if (r.getRoomCategory() != null && r.getRoomCategory().getRoomCategoryId() == categoryId) {
+                r.getRoomCategory().updatePrice(newPrice);
+            }
+        }
+        return true;
     }
 }

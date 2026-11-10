@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox spacing="16.0" style="-fx-background-color: transparent;"
+      xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.apache.maven.archetypes.hotelflow.Controller.UsersManagementController">
+
+    <!-- Üst Başlık ve Yeni Kullanıcı Butonu -->
+    <HBox alignment="CENTER_LEFT" spacing="12.0">
+        <VBox HBox.hgrow="ALWAYS">
+            <Label fx:id="lblHeaderTitle" text="User &amp; Staff Directory" textFill="#0f172a">
+                <font>
+                    <Font name="System Bold" size="20.0" />
+                </font>
+            </Label>
+            <Label fx:id="lblHeaderSubtitle" text="Create, configure, and manage system accounts and role permissions." textFill="#64748b">
+                <font>
+                    <Font size="13.0" />
+                </font>
+            </Label>
+        </VBox>
+
+        <Button onAction="#handleNewUser" text="+ Create Account"
+                style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 16; -fx-cursor: hand;" />
+    </HBox>
+
+    <!-- KPI Sayaç Kartları -->
+    <HBox spacing="12.0">
+        <HBox spacing="8.0" alignment="CENTER_LEFT"
+              style="-fx-background-color: white; -fx-padding: 10 16; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+            <Label text="Total Registered:" textFill="#64748b" style="-fx-font-size: 12px; -fx-font-weight: bold;" />
+            <Label fx:id="lblTotalUsers" text="0" textFill="#0f172a" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+        </HBox>
+
+        <HBox spacing="8.0" alignment="CENTER_LEFT"
+              style="-fx-background-color: white; -fx-padding: 10 16; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+            <Label text="Active (Enabled):" textFill="#15803d" style="-fx-font-size: 12px; -fx-font-weight: bold;" />
+            <Label fx:id="lblActiveUsers" text="0" textFill="#15803d" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+        </HBox>
+
+        <HBox spacing="8.0" alignment="CENTER_LEFT"
+              style="-fx-background-color: white; -fx-padding: 10 16; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+            <Label text="Showing in View:" textFill="#2563eb" style="-fx-font-size: 12px; -fx-font-weight: bold;" />
+            <Label fx:id="lblRoleUsers" text="0" textFill="#2563eb" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+        </HBox>
+    </HBox>
+
+    <!-- Filtreleme Çubuğu -->
+    <HBox alignment="CENTER_LEFT" spacing="12.0"
+          style="-fx-background-color: white; -fx-padding: 12 16; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+        <TextField fx:id="searchField" promptText="Search username, name, email or ID..." prefWidth="300.0"
+                   style="-fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-padding: 6 10;" />
+
+        <ComboBox fx:id="roleFilterCombo" promptText="Filter Role" prefWidth="160.0"
+                  style="-fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6;" />
+
+        <Region HBox.hgrow="ALWAYS" />
+
+        <Button onAction="#handleToggleActive" text="Toggle Active / Disabled"
+                style="-fx-background-color: #f8fafc; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 6 12; -fx-cursor: hand; -fx-text-fill: #334155;" />
+        <Button onAction="#handleResetFilters" text="Reset"
+                style="-fx-background-color: #f1f5f9; -fx-text-fill: #475569; -fx-background-radius: 6; -fx-cursor: hand; -fx-padding: 6 14;" />
+        <Button onAction="#handleRefresh" text="Refresh"
+                style="-fx-background-color: #e2e8f0; -fx-text-fill: #334155; -fx-background-radius: 6; -fx-cursor: hand; -fx-padding: 6 14;" />
+    </HBox>
+
+    <!-- Kullanıcılar Tablosu -->
+    <TableView fx:id="usersTable" VBox.vgrow="ALWAYS"
+               style="-fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+        <columns>
+            <TableColumn fx:id="colUserId" text="ID" prefWidth="60.0" />
+            <TableColumn fx:id="colUsername" text="Username" prefWidth="150.0" />
+            <TableColumn fx:id="colFullName" text="Full Name" prefWidth="180.0" />
+            <TableColumn fx:id="colEmail" text="Email Address" prefWidth="200.0" />
+            <TableColumn fx:id="colRole" text="System Role" prefWidth="130.0" />
+            <TableColumn fx:id="colHotel" text="Assigned Hotel" prefWidth="180.0" />
+            <TableColumn fx:id="colStatus" text="Account Status" prefWidth="120.0" />
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+        </columnResizePolicy>
+    </TableView>
+
+    <!-- Alt Durum Çubuğu -->
+    <HBox alignment="CENTER_LEFT" spacing="8.0" style="-fx-padding: 4 8;">
+        <Label fx:id="statusMessageLabel" text="Ready." textFill="#64748b" style="-fx-font-size: 12px;" />
+    </HBox>
+
+</VBox>

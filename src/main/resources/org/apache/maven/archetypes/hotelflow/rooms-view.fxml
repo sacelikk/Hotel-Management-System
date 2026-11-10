@@ -23,8 +23,12 @@
                 </font>
             </Label>
         </VBox>
-        <Button onAction="#handleNewRoom" text="+ Add New Room"
-                style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 16; -fx-cursor: hand;" />
+        <HBox spacing="8.0">
+            <Button onAction="#handleManagePricing" text="⚙ Manage Category Rates"
+                    style="-fx-background-color: #0f172a; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 16; -fx-cursor: hand;" />
+            <Button onAction="#handleNewRoom" text="+ Add New Room"
+                    style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 16; -fx-cursor: hand;" />
+        </HBox>
     </HBox>
 
     <!-- Hızlı Durum Kartları (KPI Mini Rozetleri) -->

@@ -15,7 +15,8 @@ public class TestRunner {
                 BookingConflictTest.class,
                 DataStoreSyncTest.class,
                 ReportServiceTest.class,
-                SeasonalServiceTest.class
+                SeasonalServiceTest.class,
+                StaffAndHotelManagementTest.class
         };
 
         int totalTests = 0;

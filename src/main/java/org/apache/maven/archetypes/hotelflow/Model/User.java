@@ -1,6 +1,5 @@
 package org.apache.maven.archetypes.hotelflow.Model;
 
-
 public class User {
     private Long userId;
     private String username;
@@ -9,38 +8,38 @@ public class User {
     private String email;
     private boolean active;
     private Role role;
+    private Long hotelId;
 
-    // Parametresiz yapıcı (Constructor)
     public User() {
         this.active = true;
     }
 
-    // Parametreli yapıcı (Constructor)
     public User(Long userId, String username, String passwordHash, String fullName, String email, Role role) {
+        this(userId, username, passwordHash, fullName, email, role, null);
+    }
+
+    public User(Long userId, String username, String passwordHash, String fullName, String email, Role role, Long hotelId) {
         this.userId = userId;
         this.username = username;
         this.passwordHash = passwordHash;
         this.fullName = fullName;
         this.email = email;
         this.role = role;
+        this.hotelId = hotelId;
         this.active = true;
     }
 
-    // Class diyagramındaki metotlar
     public boolean authenticate(String password) {
         if (!this.active) {
             return false;
         }
-        // Şimdilik düz eşleşme kontrolü (ileride BCrypt/Hashing eklenebilir)
         return this.passwordHash != null && this.passwordHash.equals(password);
     }
 
     public void logout() {
-        // Oturum kapatma mantığı (UserSession üzerinden de yönetilir)
         System.out.println(this.username + " oturumu kapatıldı.");
     }
 
-    // Getter ve Setter Metotları
     public Long getUserId() {
         return userId;
     }
@@ -97,15 +96,16 @@ public class User {
         this.role = role;
     }
 
+    public Long getHotelId() {
+        return hotelId;
+    }
+
+    public void setHotelId(Long hotelId) {
+        this.hotelId = hotelId;
+    }
+
     @Override
     public String toString() {
-        return "User{" +
-                "userId=" + userId +
-                ", username='" + username + '\'' +
-                ", fullName='" + fullName + '\'' +
-                ", email='" + email + '\'' +
-                ", role=" + role +
-                ", active=" + active +
-                '}';
+        return fullName + " (" + username + " - " + role + ")";
     }
 }

@@ -67,7 +67,11 @@ public class HelloController {
             return;
         }
 
-        User user = mockUsers.get(username.toLowerCase());
+        // DataStore üzerinden kullanıcı doğrulama (veya mock fallback)
+        User user = org.apache.maven.archetypes.hotelflow.Util.DataStore.getInstance().findUserByUsername(username);
+        if (user == null) {
+            user = mockUsers.get(username.toLowerCase());
+        }
 
         if (user != null && user.authenticate(password)) {
             UserSession.getInstance().login(user);//login time

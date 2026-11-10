@@ -305,6 +305,92 @@ public class RoomsController {
     }
 
     @FXML
+    private void handleManagePricing() {
+        Dialog<Boolean> dialog = new Dialog<>();
+        dialog.setTitle("Manage Room Category Rates");
+        dialog.setHeaderText("Manager Control: Configure base nightly rates per room category");
+
+        ButtonType updateBtn = new ButtonType("Update Rate", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(updateBtn, ButtonType.CANCEL);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(12);
+        grid.setVgap(12);
+        grid.setPadding(new javafx.geometry.Insets(20, 20, 10, 10));
+
+        ComboBox<RoomCategory> catCombo = new ComboBox<>();
+        catCombo.getItems().addAll(DataStore.getInstance().getRoomCategories());
+        if (!catCombo.getItems().isEmpty()) {
+            catCombo.setValue(catCombo.getItems().get(0));
+        }
+
+        catCombo.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(RoomCategory item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? "" : item.getName() + " (Current: €" + String.format(java.util.Locale.US, "%.2f", item.getBasePrice()) + ")");
+            }
+        });
+        catCombo.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(RoomCategory item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? "" : item.getName() + " (Current: €" + String.format(java.util.Locale.US, "%.2f", item.getBasePrice()) + ")");
+            }
+        });
+
+        TextField priceField = new TextField();
+        if (catCombo.getValue() != null) {
+            priceField.setText(String.format(java.util.Locale.US, "%.2f", catCombo.getValue().getBasePrice()));
+        }
+
+        catCombo.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                priceField.setText(String.format(java.util.Locale.US, "%.2f", newVal.getBasePrice()));
+            }
+        });
+
+        grid.add(new Label("Select Room Category:"), 0, 0);
+        grid.add(catCombo, 1, 0);
+        grid.add(new Label("New Base Nightly Price (€):"), 0, 1);
+        grid.add(priceField, 1, 1);
+
+        dialog.getDialogPane().setContent(grid);
+
+        dialog.setResultConverter(btn -> {
+            if (btn == updateBtn) {
+                RoomCategory selected = catCombo.getValue();
+                if (selected == null) {
+                    showAlert(Alert.AlertType.ERROR, "Selection Required", "Please select a category.");
+                    return false;
+                }
+
+                try {
+                    double newPrice = Double.parseDouble(priceField.getText().trim());
+                    if (newPrice < 0) throw new NumberFormatException();
+
+                    boolean updated = DataStore.getInstance().updateRoomCategoryPrice(selected.getRoomCategoryId(), newPrice);
+                    return updated;
+                } catch (Exception ex) {
+                    showAlert(Alert.AlertType.ERROR, "Invalid Input", "Please enter a valid positive numeric price.");
+                    return false;
+                }
+            }
+            return false;
+        });
+
+        Optional<Boolean> result = dialog.showAndWait();
+        result.ifPresent(updated -> {
+            if (updated) {
+                applyFilters();
+                roomsTable.refresh();
+                showAlert(Alert.AlertType.INFORMATION, "Rates Updated",
+                        "Room category pricing successfully updated and applied to all associated hotel rooms!");
+            }
+        });
+    }
+
+    @FXML
     private void handleRefresh() {
         DataStore.getInstance().syncRoomStatuses();
         searchField.clear();
